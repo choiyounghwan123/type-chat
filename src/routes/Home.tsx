@@ -13,9 +13,6 @@ const Home = () =>{
     useEffect(()=>{
         socket.emit('add user',nickName);
 
-        socket.on('message',(msg)=>{
-          setContent(content.concat(msg)); //all
-        })
     },[])
 
     useEffect(()=>{
@@ -26,6 +23,9 @@ const Home = () =>{
 
     useEffect(()=>{
 
+      socket.on('message',(msg)=>{
+        setContent(content.concat(msg)); //all
+      })
 
       socket.on('onechat',msg=>{ //1:1
         console.log('succses');
