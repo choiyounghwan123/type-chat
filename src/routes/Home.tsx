@@ -12,6 +12,10 @@ const Home = () =>{
     let roomNumber = useRef<HTMLInputElement>(null);
     useEffect(()=>{
         socket.emit('add user',nickName);
+
+        socket.on('message',(msg)=>{
+          setContent(content.concat(msg)); //all
+        })
     },[])
 
     useEffect(()=>{
@@ -22,16 +26,10 @@ const Home = () =>{
 
     useEffect(()=>{
 
-      socket.on('message',(msg)=>{
-        setContent(content.concat(msg)); //all
-      })
 
       socket.on('onechat',msg=>{ //1:1
         console.log('succses');
       })
-
-     
-
 
     })
 
@@ -63,10 +61,10 @@ const Home = () =>{
         <p>{nickName}님</p>
         <div>
           {
-            userName.map((a)=>{
+            userName.map((a,i)=>{
               return(
                 <>
-                <p>접속 중 : {a}</p>
+                <p key={i}>접속 중 : {a}</p>
                 </>
               )
             })
@@ -81,10 +79,10 @@ const Home = () =>{
         <div>
           <h2>Message</h2>
           {
-            content.map((a)=>{
+            content.map((a,i)=>{
               return (
                 
-                <p>{a}</p>
+                <p key={i}>{a}</p>
   
               )
             })
