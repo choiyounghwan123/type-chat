@@ -7,7 +7,15 @@ const io = require('socket.io')(http,{
 });
 
 io.on('connection', socket =>{
+
+    let numUser = 0;
     console.log(' a user connected');
+
+
+    socket.on('add user',username=>{
+        console.log(username+"님이 입장하셧습니다");
+        numUser++;
+    })
 })
 
 http.listen(8080,()=>{

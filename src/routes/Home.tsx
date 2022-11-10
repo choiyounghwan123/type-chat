@@ -8,7 +8,7 @@ const Home = () =>{
     let location = useLocation();
     let nickName = location.state.nickName;
 
-    let socket1 = io('http://localhost8080');
+    // let socket1 = io('http://localhost8080');
 
     useEffect(()=>{
         socket.emit('add user',nickName);
