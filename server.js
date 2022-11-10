@@ -19,7 +19,7 @@ io.on('connection', socket =>{
         numUser++;
         login_id[username]=socket.id;
 
-        io.sockets.emit('login',username);
+        socket.broadcast.emit('login',username);
 
         socket.on('joinroom',(roomname)=>{
             socket.join(roomname);

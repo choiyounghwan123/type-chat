@@ -15,27 +15,33 @@ const Home = () =>{
     },[])
 
     useEffect(()=>{
+      socket.on('login',(username)=>{
+        setUserName(userName=>[userName,...username]);
+      })
+    },[socket])
+
+    useEffect(()=>{
 
       socket.on('message',(msg)=>{
-        setContent([msg,...content]); //all
+        setContent(content.concat(msg)); //all
       })
 
       socket.on('onechat',msg=>{ //1:1
         console.log('succses');
       })
 
-      socket.on('login',username=>{
-        setUserName([username,...userName]);
-      })
+     
 
 
     })
+
+
 
     const onClick = () =>{
       if(msg.current){
        socket.emit('new msg',{
         msg:msg.current.value,
-        username:'choi',
+        // username:'choi',
         me:nickName,
        });
        msg.current.value ='';
@@ -46,7 +52,6 @@ const Home = () =>{
       if(roomNumber.current){
         socket.emit('joinroom',roomNumber.current.value);
       }
-     
     }
 
 
@@ -74,16 +79,13 @@ const Home = () =>{
         }}></input>
         <button onClick={onClick}>전송</button>
         <div>
-          <input type='text' placeholder="roomnumber" ref={roomNumber}></input>
-          <button onClick={makeRoom}>채팅방 접속하기</button>
-        </div>
-        <div>
+          <h2>Message</h2>
           {
             content.map((a)=>{
               return (
-                <>
+                
                 <p>{a}</p>
-                </>
+  
               )
             })
           }
