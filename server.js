@@ -15,6 +15,9 @@ io.on('connection', socket =>{
     socket.on('add user',username=>{
         console.log(username+"님이 입장하셧습니다");
         numUser++;
+        socket.on('new msg',msg=>{
+            console.log(msg);
+        })
     })
 })
 
