@@ -17,7 +17,10 @@ io.on('connection', socket =>{
         numUser++;
         socket.on('new msg',msg=>{
             console.log(msg);
+            io.sockets.emit('message',msg);
         })
+
+       
     })
 })
 

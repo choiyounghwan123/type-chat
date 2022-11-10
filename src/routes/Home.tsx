@@ -1,29 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { io } from "socket.io-client";
 import { socket } from "../component/socket";
 
 const Home = () =>{
 
     let location = useLocation();
     let nickName = location.state.nickName;
-    let [msg,setMsg]=useState('');
+    let msg=useRef<HTMLInputElement>(null);
+    let name ='';
 
     useEffect(()=>{
         socket.emit('add user',nickName);
     },[])
 
-    const sendMsg = () =>{
-
-    }
-
-    const onChange = (e:React.ChangeEvent<HTMLInputElement>) =>{
-        setMsg(e.target.value);
-    }
+    socket.on('message',msg=>{
+      console.log(msg);
+    })
+  
 
     const onClick = () =>{
-      socket.emit('new msg',msg);
-      setMsg('');
+      if(msg.current){
+       socket.emit('new msg',msg.current.value);
+       msg.current.value ='';
+      }
     }
 
 
@@ -32,7 +31,7 @@ const Home = () =>{
       <div>
         <p>Home</p>
         <p>{nickName}님</p>
-        <input type='text' placeholder="msg" value={msg} onChange={onChange} onKeyPress={(e:React.KeyboardEvent<HTMLElement>)=>{
+        <input type='text' placeholder="msg" ref={msg} onKeyPress={(e:React.KeyboardEvent<HTMLElement>)=>{
           if(e.key === 'Enter'){
             onClick();
           }
