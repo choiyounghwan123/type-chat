@@ -1,4 +1,4 @@
-const Roomchar = () =>{
+const Roomchat = () =>{
     return(
         <div>
             
@@ -6,4 +6,4 @@ const Roomchar = () =>{
     )
 }
 
-export default Roomchar;
+export default Roomchat;
