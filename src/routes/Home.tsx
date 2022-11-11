@@ -1,3 +1,4 @@
+import { send } from "process";
 import React, { useEffect, useRef, useState, useTransition } from "react";
 import { useLocation } from "react-router-dom";
 import { socket } from "../component/socket";
@@ -10,6 +11,7 @@ const Home = () =>{
     let [content,setContent] = useState<string[]>([]);
     let [userName,setUserName] = useState<string[]>([]);
     let roomNumber = useRef<HTMLInputElement>(null);
+    let whisper = useRef<HTMLInputElement>(null);
     useEffect(()=>{
       socket.emit('add user',nickName);
     },[])
@@ -35,23 +37,32 @@ const Home = () =>{
 
     
 
-    // socket.on('onechat',msg=>{ //1:1
-    //   console.log('succses');
-    // })
-
   
+    const sendMsg = (data:any) =>{
+      if(whisper.current?.value){
+        socket.emit('new msg',{
+          msg:data,
+          username:whisper.current.value,
+          me:nickName,
+        });
+      }else{
+        socket.emit('new msg',{
+        msg:data,
+        me:nickName,
+      });
+      }
+      
+
+    }
 
 
     const onClick = () =>{
       if(msg.current){
-       socket.emit('new msg',{
-        msg:msg.current.value,
-        // username:'choi',
-        me:nickName,
-       });
-       msg.current.value ='';
+        sendMsg(msg.current.value);
+        msg.current.value ='';
+       };
       }
-    }
+    
 
     const makeRoom = () =>{
       if(roomNumber.current){
@@ -59,6 +70,7 @@ const Home = () =>{
       }
     }
 
+  
 
 
 
@@ -95,6 +107,8 @@ const Home = () =>{
             })
           }
         </div>
+        <input type='text' placeholder="username" ref={whisper}></input>
+        <button>귓속말</button>
       </div>
     )
 }

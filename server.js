@@ -30,22 +30,22 @@ io.on('connection', socket =>{
             console.log(roomname+"번방 접속");
         })
 
-        
+   
         
         
         socket.on('new msg',msg=>{
             console.log(msg);
-
-
-
             let content =`${msg.me}:${msg.msg}`
 
-            if(!msg.username)io.sockets.emit('message',content); // All chat
-            
-            
-            if(login_id[msg.username]){ //1:1 chat
-                io.to(login_id[msg.username]).emit('onechat',msg.msg);
-                     }
+                    if(!msg.username){
+                            io.sockets.emit('message',content);
+                    }
+                    else{
+                            io.to(login_id[msg.username]).emit('message',content);
+                            console.log(login_id[msg.username])
+                    }
+    
+
 
         })
 
