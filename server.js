@@ -6,11 +6,15 @@ const io = require('socket.io')(http,{
     }
 });
 
-let login_id={};
+io.listen(8080,()=>{
+    console.log('Server is running on 8080 port');
+})
 
+let login_id={};
+let numUser = 0;
 io.on('connection', socket =>{
 
-    let numUser = 0;
+
     console.log(' a user connected');
 
 
@@ -19,7 +23,7 @@ io.on('connection', socket =>{
         numUser++;
         login_id[username]=socket.id;
 
-        socket.broadcast.emit('login',username);
+        socket.emit('login',numUser);
 
         socket.on('joinroom',(roomname)=>{
             socket.join(roomname);
@@ -48,8 +52,6 @@ io.on('connection', socket =>{
         
      console.log(`user : ${numUser}`);
     })
+    
 })
 
-http.listen(8080,()=>{
-    console.log('server is running on 8080 port');
-})

@@ -11,28 +11,35 @@ const Home = () =>{
     let [userName,setUserName] = useState<string[]>([]);
     let roomNumber = useRef<HTMLInputElement>(null);
     useEffect(()=>{
-        socket.emit('add user',nickName);
-
+      socket.emit('add user',nickName);
     },[])
 
     useEffect(()=>{
-      socket.on('login',(username)=>{
-        setUserName(userName=>[userName,...username]);
-      })
-    },[socket])
+      
 
-    useEffect(()=>{
+      socket.on('login',(username)=>{
+        setUserName(userName=>[username,...userName]);
+      })
 
       socket.on('message',(msg)=>{
         setContent(content.concat(msg)); //all
       })
 
-      socket.on('onechat',msg=>{ //1:1
-        console.log('succses');
-      })
 
+
+      return()=>{
+        socket.off('login');
+        socket.off('message');
+      }
     })
 
+    
+
+    // socket.on('onechat',msg=>{ //1:1
+    //   console.log('succses');
+    // })
+
+  
 
 
     const onClick = () =>{
