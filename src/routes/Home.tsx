@@ -1,10 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import { socket } from "../component/socket";
-
-interface User {
-  userName: string;
-  id: string;
-}
+import { socket } from "src/component/socket";
+import { User } from "types";
 
 const Home = () => {
   const [chatHistory, setChatHistory] = useState<string[]>([]);
