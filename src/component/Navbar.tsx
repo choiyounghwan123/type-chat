@@ -4,8 +4,8 @@ import Navbar from "react-bootstrap/Navbar";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function BasicExample() {
+
   return (
-    //fdsfsd
     <Navbar bg="light" expand="lg">
       <Container>
         <Navbar.Brand href="#home">Chat App</Navbar.Brand>
