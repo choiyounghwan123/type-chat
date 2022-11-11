@@ -90,7 +90,7 @@ const Home = () => {
   const [user, setUser] = useState<User>();
   const [message, setMessage] = useState<string>("");
   // let roomNumber = useRef<HTMLInputElement>(null);
-  let aa=10;
+
   // 유저가 채팅방에 접속했다고 알림
   useEffect(() => {
     socket.emit("add user");
