@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { send } from "process";
 import React, { useEffect, useRef, useState, useTransition } from "react";
 import { useLocation } from "react-router-dom";
@@ -112,5 +113,10 @@ const Home = () =>{
       </div>
     )
 }
+=======
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { socket } from "src/component/socket";
+import { User } from "types";
+>>>>>>> 330fbb2 (chore: baseUrl 설정)
 
 export default Home;
