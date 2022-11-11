@@ -13,7 +13,7 @@ let login_id = {};
 const users = [];
 
 io.on("connection", (socket) => {
-  
+  let numUser = 0;
   console.log(" a user connected");
 
   // 각 연결마다 고유한 유저를 생성
