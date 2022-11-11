@@ -8,20 +8,27 @@ const io = require("socket.io")(http, {
   },
 });
 
+
+let login_id = {};
 const users = [];
 
 io.on("connection", (socket) => {
+  
+  console.log(" a user connected");
+
   // 각 연결마다 고유한 유저를 생성
   const currentUser = {
     id: socket.id,
     userName: `익명 ${Date.now()}`,
   };
 
-
+io.listen(8080,()=>{
+    console.log('Server is running on 8080 port');
+})
 
 let login_id={};
 let numUser = 0;
-
+io.on('connection', socket =>{
 
 
     console.log(' a user connected');
@@ -43,6 +50,46 @@ let numUser = 0;
         socket.emit('login',numUser);
 
 
+    console.log(username + "님이 입장하셧습니다");
+    numUser++;
+    login_id[username] = socket.id;
+
+
+    socket.on("joinroom", (roomname) => {
+      socket.join(roomname);
+      console.log(roomname + "번방 접속");
+    });
+
+    socket.on("new msg", (msg) => {
+      const content = `${msg.me}:${msg.msg}`;
+
+      if (!msg.username) io.sockets.emit("message", content); // All chat
+
+      if (login_id[msg.username]) {
+        //1:1 chat
+        io.to(login_id[msg.username]).emit("onechat", msg.msg);
+      }
+    });
+
+    console.log(`user : ${numUser}`);
+
+   
+        
+        
+        socket.on('new msg',msg=>{
+            console.log(msg);
+            let content =`${msg.me}:${msg.msg}`
+
+                    if(!msg.username){
+                            io.sockets.emit('message',content);
+                    }
+                    else{
+                            io.to(login_id[msg.username]).emit('message',content);
+                            console.log(login_id[msg.username])
+                    }
+    
+
+
 
     // 소켓 연결 끊길 때,
     socket.on("disconnecting", (reason) => {
@@ -59,4 +106,9 @@ http.listen(8080, () => {
 });
 
         
+     console.log(`user : ${numUser}`);
+    })
+    
+})
+
 
