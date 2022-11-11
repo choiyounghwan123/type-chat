@@ -4,7 +4,13 @@ import Navbar from 'react-bootstrap/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function BasicExample() {
+<<<<<<< HEAD
   return (
+=======
+
+
+ return(
+>>>>>>> 9e61b9f (fdsfsdf)
 
     <Navbar bg="light" expand="lg">
       <Container>
