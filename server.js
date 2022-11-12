@@ -1,4 +1,4 @@
-const { pushUser, removeUser } = require("./function/server");
+const { pushUser, removeUser } = require("./src/function/server");
 
 const app = require("express")();
 const http = require("http").createServer(app);
@@ -7,10 +7,6 @@ const io = require("socket.io")(http, {
     origin: "*",
   },
 });
-
-// io.listen(8080, () => {
-//   console.log("Server is running on 8080 port");
-// });
 
 let login_id = {};
 const users = [];
@@ -28,7 +24,13 @@ io.on("connection", (socket) => {
   // 유저 로그인 후 채팅방에 들어갈 때, 유저 닉네임 할당
   socket.on("user login", (nickName) => {
     currentUser["userName"] = nickName;
+
+    // 로그인 유저 정보 전달
+    socket.emit("user info", currentUser);
   });
+
+  // 비로그인 유저 정보 클라이언트에 전달
+  socket.emit("user info", currentUser);
 
   // 유저가 채팅방에 들어왔을 때
   socket.on("add user", () => {
@@ -36,7 +38,6 @@ io.on("connection", (socket) => {
 
     pushUser(users, currentUser); // 채팅방 유저 목록에 추가
     io.sockets.emit("user in", users, currentUser); // 채팅방 유저 목록 업데이트
-    socket.emit("user info", currentUser); // 유저 정보 업데이트
 
     console.log(username + "님이 입장하셧습니다");
     numUser++;
@@ -48,17 +49,24 @@ io.on("connection", (socket) => {
     });
 
     socket.on("new msg", (msg) => {
-      const content = `${msg.me}:${msg.msg}`;
+      const chatData = {
+        message: msg.msg,
+        user: msg.me,
+      };
 
-      if (!msg.username) io.sockets.emit("message", content); // All chat
+      if (!msg.username) {
+        // All chat
+        io.sockets.emit("message", chatData);
+        return;
+      }
+
       const target = users.find((user) => user.userName === msg.username);
 
-      if (target) io.to(target.id).emit("message", content); // 1:1 chat
-
-      // if (login_id[msg.username]) {
-      //   //1:1 chat
-      //   io.to(login_id[msg.username]).emit("onechat", msg.msg);
-      // }
+      if (target) {
+        // 1:1 chat
+        io.to(target.id).emit("message", chatData); // 상대방
+        io.to(msg.me.id).emit("message", chatData); // 본인
+      }
     });
 
     console.log(`user : ${numUser}`);
@@ -75,20 +83,3 @@ io.on("connection", (socket) => {
 http.listen(8080, () => {
   console.log("server is running on 8080 port");
 });
-
-// 충돌 부분
-
-// socket.emit('login',numUser);
-// socket.on('new msg',msg=>{
-//   console.log(msg);
-//   let content =`${msg.me}:${msg.msg}`
-
-//           if(!msg.username){
-//                   io.sockets.emit('message',content);
-//           }
-//           else{
-//                   io.to(login_id[msg.username]).emit('message',content);
-//                   console.log(login_id[msg.username])
-//           }
-
-//     console.log(`user : ${numUser}`);
