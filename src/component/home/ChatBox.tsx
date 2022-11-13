@@ -65,41 +65,61 @@ const ChatBox = ({ user }: Props) => {
   // 채팅방에 접속시 공지
   useEffect(() => {
     socket.on("user in", (_, { userName }: User) => {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          message: `${userName}님이 방에 들어왔어요`,
-          user: {
-            userName: "system",
-            id: "system",
-          },
-        },
-      ]);
+      // setChatHistory((prev) => [
+      //   ...prev,
+      //   {
+      //     message: `${userName}님이 방에 들어왔어요`,
+      //     user: {
+      //       userName: "system",
+      //       id: "system",
+      //     },
+      //   },
+      // ]);
+
+      setChatHistory(chatHistory.concat( {message: `${userName}님이 방에 들어왔어요`,
+      user: {
+        userName: "system",
+        id: "system",
+      }},))
     });
-  }, []);
+  });
 
   // 채팅방에 있던 유저가 나갔을 때, 공지
   useEffect(() => {
     socket.on("user left", (_, { userName }: User) => {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          message: `${userName}님이 방을 탈출했어요`,
-          user: {
-            userName: "system",
-            id: "system",
-          },
+      // setChatHistory((prev) => [
+      //   ...prev,
+      //   {
+      //     message: `${userName}님이 방을 탈출했어요`,
+      //     user: {
+      //       userName: "system",
+      //       id: "system",
+      //     },
+      //   },
+      // ]);
+
+      setChatHistory(chatHistory.concat( {
+        message: `${userName}님이 방을 탈출했어요`,
+        user: {
+          userName: "system",
+          id: "system",
         },
-      ]);
+      }));
+
     });
-  }, []);
+  });
 
   // 채팅이 입력되면 채팅 목록 업데이트
   useEffect(() => {
     socket.on("message", (message: ChatData) => {
-      setChatHistory((prev) => [...prev, message]); //all
+      setChatHistory(chatHistory.concat(message)); //all
     });
-  }, []);
+
+    return ()=>{
+      socket.off('message')
+    }
+
+  });
 
   return (
     <>
