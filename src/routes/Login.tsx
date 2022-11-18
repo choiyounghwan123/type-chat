@@ -18,12 +18,14 @@ const Login = (): JSX.Element => {
 
     // 채팅방에 들어 갈 유저를 서버에 전달함
     socket.emit("user login", nickname);
-    socket.on("user login", ({ success }) => {
-      console.log(success);
+    socket.on("user login valid", ({ success }) => {
       if (!success) {
         setNotice("이미 사용중인 닉네임입니다");
         return;
       }
+
+      // 유저가 채팅방에 접속했다고 알림
+      socket.emit("add user");
 
       navigate("/", {
         state: {
