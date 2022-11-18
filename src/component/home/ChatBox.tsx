@@ -148,7 +148,6 @@ const ChatLog = styled.div`
   align-items: center;
   justify-content: ${({ isMe }: { isMe: boolean }) =>
     isMe ? "flex-end" : "flex-start"};
-  padding: 0 1rem;
 `;
 
 const Form = styled.form`

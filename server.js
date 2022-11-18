@@ -22,15 +22,22 @@ io.on("connection", (socket) => {
   };
 
   // 유저 로그인 후 채팅방에 들어갈 때, 유저 닉네임 할당
-  socket.on("user login", (nickName) => {
-    currentUser["userName"] = nickName;
+  socket.on("user login", (nickname) => {
+    if (users.find(({ userName }) => userName === nickname)) {
+      socket.emit("user login", { success: false });
+
+      return;
+    }
+
+    currentUser["userName"] = nickname;
 
     // 로그인 유저 정보 전달
+    socket.emit("user login", { success: true });
     socket.emit("user info", currentUser);
   });
 
-  // 비로그인 유저 정보 클라이언트에 전달
-  socket.emit("user info", currentUser);
+  // // 비로그인 유저 정보 클라이언트에 전달
+  // socket.emit("user info", currentUser);
 
   // 유저가 채팅방에 들어왔을 때
   socket.on("add user", () => {
