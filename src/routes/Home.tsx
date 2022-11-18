@@ -1,35 +1,25 @@
-import { useEffect, useState } from "react";
 import ChatBox from "component/home/ChatBox";
 import EnterUsersBox from "component/home/EnterUsersBox";
-import { socket } from "component/socket";
-import { User } from "types";
 import styled from "styled-components";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { socket } from "component/socket";
 
 const Home = () => {
-  const [user, setUser] = useState<User>();
-  const [users, setUsers] = useState<User[]>([]);
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
+  useEffect(() => {
+    if (!state?.nickname) {
+      navigate("/login");
+      return;
+    }
+
+    // 채팅방에 들어 갈 유저를 서버에 전달함
+    socket.emit("user login", state.nickname);
+  }, [navigate, state]);
+
   // const roomNumber = useRef<HTMLInputElement>(null);
-
-  // 클라이언트 소켓(?)에 연결된 유저 정보를 가져옴
-  useEffect(() => {
-    socket.on("user info", (user: User) => {
-      setUser(user);
-    });
-  }, []);
-
-  // 채팅방에 접속한 유저 목록을 가져옴
-  useEffect(() => {
-    socket.on("user in", (users: User[]) => {
-      setUsers(users);
-    });
-  }, []);
-
-  // 채팅방에 있던 유저가 나갔을 때, 유저 목록 업데이트
-  useEffect(() => {
-    socket.on("user left", (users: User[]) => {
-      setUsers(users);
-    });
-  }, []);
 
   // const makeRoom = () => {
   //   if (roomNumber.current) {
@@ -38,15 +28,13 @@ const Home = () => {
   // };
 
   return (
-    <Container>
-      {user && (
-        <EnterUsersBox
-          myUser={user}
-          otherUsers={users.filter(({ id }) => id !== user.id)}
-        />
-      )}
-      {user && <ChatBox user={user} />}
-    </Container>
+    <>
+      <Container>
+        <EnterUsersBox />
+        <ChatBox />
+      </Container>
+      <Outlet />
+    </>
   );
 };
 

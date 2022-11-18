@@ -1,18 +1,19 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { socket } from "component/socket";
 import { User, ChatData } from "types";
 import styled from "styled-components";
 import { scrollBottom } from "function/client";
+import useUser from "hooks/useUser";
+import { useLocation } from "react-router-dom";
+import Send from "assets/svgs/Send";
 
-interface Props {
-  user: User;
-}
-
-const ChatBox = ({ user }: Props) => {
-  const [message, setMessage] = useState<string>("");
+const ChatBox = () => {
+  const { user } = useUser();
+  const refMessageInput = useRef<HTMLInputElement>(null);
   const whisper = useRef<HTMLInputElement>(null);
   const refChatHistoryBox = useRef<HTMLDivElement>(null);
   const [chatHistory, setChatHistory] = useState<ChatData[]>([]);
+  const { state } = useLocation();
 
   const sendMsg = (message: string) => {
     if (!user) return;
@@ -31,21 +32,17 @@ const ChatBox = ({ user }: Props) => {
     }
   };
 
-  // 채팅 입력
-  const onChangeMessage = (event: ChangeEvent<HTMLInputElement>) => {
-    const {
-      currentTarget: { value },
-    } = event;
-
-    setMessage(value);
-  };
-
   // 채팅 서버에 전달
   const onSubmitMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!refMessageInput.current) return;
 
-    sendMsg(message);
-    setMessage("");
+    const {
+      current: { value },
+    } = refMessageInput;
+
+    sendMsg(value);
+    refMessageInput.current.value = "";
   };
 
   // chatHistory 업데이트 시 스크롤을 맨 아래로 내림
@@ -56,11 +53,6 @@ const ChatBox = ({ user }: Props) => {
       scrollBottom(current);
     }
   }, [chatHistory]);
-
-  // 유저가 채팅방에 접속했다고 알림
-  useEffect(() => {
-    socket.emit("add user");
-  }, []);
 
   // 채팅방에 접속시 공지
   useEffect(() => {
@@ -75,7 +67,7 @@ const ChatBox = ({ user }: Props) => {
         })
       );
     });
-  }, [chatHistory]);
+  }, [chatHistory, state]);
 
   // 채팅방에 있던 유저가 나갔을 때, 공지
   useEffect(() => {
@@ -90,7 +82,7 @@ const ChatBox = ({ user }: Props) => {
         })
       );
     });
-  }, [chatHistory]);
+  }, [chatHistory, state]);
 
   // 채팅이 입력되면 채팅 목록 업데이트
   useEffect(() => {
@@ -107,21 +99,28 @@ const ChatBox = ({ user }: Props) => {
     <>
       <Container>
         <ChatHistoryBox ref={refChatHistoryBox}>
-          {chatHistory.map(({ user: { id, userName }, message }, index) => (
-            <ChatLog key={index} isMe={user.id === id}>
-              <Chat isMe={user.id === id}>{`${userName}: ${message}`}</Chat>
-            </ChatLog>
-          ))}
+          {chatHistory.map(({ user: { id, userName }, message }) =>
+            id === "system" ? (
+              <ChatLogSystem key={id}>{message}</ChatLogSystem>
+            ) : (
+              <ChatLog key={id} isMe={user?.id === id}>
+                <Chat isMe={user?.id === id}>{`${userName}: ${message}`}</Chat>
+              </ChatLog>
+            )
+          )}
         </ChatHistoryBox>
         <Form onSubmit={onSubmitMessage}>
-          <input type="text" placeholder="누구에게 보낼까요?" ref={whisper} />
-          <input
+          {/* <input type="text" placeholder="누구에게 보낼까요?" ref={whisper} /> */}
+          <MessageInput
             type="text"
             placeholder="어떤 말을 할까요?"
-            onChange={onChangeMessage}
-            value={message}
+            ref={refMessageInput}
           />
-          <button type="submit">전송</button>
+          <SendButton>
+            <button type="submit">
+              <Send width={32} height={32} />
+            </button>
+          </SendButton>
         </Form>
       </Container>
     </>
@@ -129,6 +128,26 @@ const ChatBox = ({ user }: Props) => {
 };
 
 export default ChatBox;
+
+const SendButton = styled.div`
+  background-color: #4c7dfe;
+  width: 3rem;
+  height: 100%;
+  button {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const MessageInput = styled.input`
+  width: 100%;
+  height: 100%;
+  outline: none;
+  padding: 0 1rem;
+`;
 
 const Chat = styled.div`
   padding: 10px;
@@ -148,7 +167,15 @@ const ChatLog = styled.div`
   align-items: center;
   justify-content: ${({ isMe }: { isMe: boolean }) =>
     isMe ? "flex-end" : "flex-start"};
-  padding: 0 1rem;
+`;
+
+const ChatLogSystem = styled.div`
+  width: 100%;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999999;
 `;
 
 const Form = styled.form`
@@ -166,9 +193,14 @@ const ChatHistoryBox = styled.div`
   gap: 1rem;
   display: flex;
   flex-direction: column;
+  padding: 1rem;
+  ::-webkit-scrollbar {
+    width: 0rem;
+  }
 `;
 
 const Container = styled.div`
   width: 100%;
   height: 100vh;
+  background-color: #3e404c;
 `;

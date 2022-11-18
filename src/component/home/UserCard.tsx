@@ -27,6 +27,8 @@ const UserNameBox = styled.div`
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  color: #ededed;
+  font-weight: 500;
 `;
 
 const UserInfoBox = styled.div`

@@ -1,19 +1,20 @@
 import styled from "styled-components";
-import { User } from "types";
 import UserCard from "component/home/UserCard";
 import Search from "assets/svgs/Search";
+import useUser from "hooks/useUser";
+import useUserList from "hooks/useUserList";
 
-interface Props {
-  myUser: User;
-  otherUsers: User[];
-}
+const defaultUser = { userName: "익명의 유저", id: "unknown" };
 
-const EnterUsersBox = ({ myUser, otherUsers }: Props) => {
+const EnterUsersBox = () => {
+  const { user } = useUser();
+  const { users } = useUserList();
+
   return (
     <>
       <Container>
         <Wrapper>
-          <UserCard user={myUser} />
+          <UserCard user={user ?? defaultUser} />
           <SearchBox>
             <SearchIcon>
               <Search />
@@ -21,9 +22,11 @@ const EnterUsersBox = ({ myUser, otherUsers }: Props) => {
             <SearchInput type="text" placeholder={`누구를 찾고 있나요?`} />
           </SearchBox>
           <UserList>
-            {otherUsers.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
+            {users
+              .filter(({ userName }) => userName !== user?.userName)
+              .map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))}
           </UserList>
         </Wrapper>
       </Container>
@@ -42,6 +45,8 @@ const SearchInput = styled.input`
   border-radius: 0.25rem;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+  background-color: #3e404c;
+  color: #999999;
 `;
 
 const SearchIcon = styled.div`
@@ -50,15 +55,17 @@ const SearchIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;
   border-radius: 0.25rem;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  background-color: #3e404c;
+  color: #999999;
+  font-weight: 600;
 `;
 
 const SearchBox = styled.div`
   width: 100%;
-  height: 2rem;
+  height: 3rem;
   margin: 1rem 0;
   display: flex;
   align-items: center;
@@ -79,7 +86,7 @@ const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   max-width: 20rem;
-  background-color: #f5f5f5;
+  background-color: #2b2d36;
   padding: 1rem;
 `;
 
